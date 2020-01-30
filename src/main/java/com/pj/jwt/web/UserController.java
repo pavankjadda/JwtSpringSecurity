@@ -3,6 +3,7 @@ package com.pj.jwt.web;
 import com.pj.jwt.domain.LoginRequest;
 import com.pj.jwt.dto.AuthorityDTO;
 import com.pj.jwt.dto.UserDTO;
+import com.pj.jwt.security.CustomUserDetails;
 import com.pj.jwt.security.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,16 +50,17 @@ public class UserController
 
 	private UserDTO mapUserAndReturnJwtToken(Authentication authentication, boolean generateToken)
 	{
-		org.springframework.security.core.userdetails.User user= (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+		CustomUserDetails customUserDetails= (CustomUserDetails) authentication.getPrincipal();
+
 		UserDTO userDTO=new UserDTO();
-		userDTO.setUsername(user.getUsername());
-		userDTO.setEnabled(user.isEnabled());
-		userDTO.setAccountNonExpired(user.isAccountNonExpired());
-		userDTO.setAccountNonLocked(user.isAccountNonLocked());
-		userDTO.setCredentialsNonExpired(user.isCredentialsNonExpired());
-		userDTO.setAuthorities(mapAuthorities(user.getAuthorities()));
+		userDTO.setUsername(customUserDetails.getUsername());
+		userDTO.setEnabled(customUserDetails.isEnabled());
+		userDTO.setAccountNonExpired(customUserDetails.isAccountNonExpired());
+		userDTO.setAccountNonLocked(customUserDetails.isAccountNonLocked());
+		userDTO.setCredentialsNonExpired(customUserDetails.isCredentialsNonExpired());
+		userDTO.setAuthorities(mapAuthorities((Collection<GrantedAuthority>) customUserDetails.getAuthorities()));
 		if(generateToken)
-			userDTO.setToken(jwtUtil.generateToken(user));
+			userDTO.setToken(jwtUtil.generateToken(customUserDetails));
 		return userDTO;
 	}
 

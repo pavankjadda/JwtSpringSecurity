@@ -1,6 +1,9 @@
+
+
+
 /* Insert Data into User Table  */
-INSERT INTO user VALUES(1,'admin','2019-01-08 17:41:58','admin','2019-01-08 17:41:58',1,1,1,1,'$2y$12$ALU6qByNCKqkaTyjdLyqyOe7nQ0mGwQY3gXqBQ3DQKdfS4Yqwd7Jq','admin');
-INSERT INTO user VALUES(2,'admin','2019-01-08 17:41:58','admin','2019-01-08 17:41:58',1,1,1,1,'$2a$12$JZipNtfy6B/wa9AvbrPq6.o9yi9TYR7CK.j3XG6BY3P3DwuFg7pWe','user');
+INSERT INTO core_user(`id`,`account_non_expired`,`account_non_locked`,`active`,`credentials_non_expired`,`password`,`username`) VALUES(1,1,1,1,1,'$2y$12$ALU6qByNCKqkaTyjdLyqyOe7nQ0mGwQY3gXqBQ3DQKdfS4Yqwd7Jq','admin');
+INSERT INTO core_user(`id`,`account_non_expired`,`account_non_locked`,`active`,`credentials_non_expired`,`password`,`username`)  VALUES(2,1,1,1,1,'$2a$12$JZipNtfy6B/wa9AvbrPq6.o9yi9TYR7CK.j3XG6BY3P3DwuFg7pWe','user');
 
 
 /* Insert Data into Role Table  */

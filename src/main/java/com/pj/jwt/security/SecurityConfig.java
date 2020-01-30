@@ -43,12 +43,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 	public void configure(HttpSecurity http) throws Exception
 	{
 		http.authorizeRequests()
-				.antMatchers("/api/v1/user/login","/api/v1/user/authenticate", "/api/v1/user/logout").permitAll()
+				.antMatchers("/api/v1/user/login","/api/v1/user/authenticate", "/api/v1/user/logout","/h2-console/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.httpBasic()
 				.and()
-				.logout().invalidateHttpSession(true).clearAuthentication(true);
+				.logout().invalidateHttpSession(true).clearAuthentication(true)
+				.and().headers().frameOptions().sameOrigin();
 
 		http.csrf().disable();
 		http.cors();
@@ -74,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 	@Bean
 	public PasswordEncoder passwordEncoder()
 	{
-		return new BCryptPasswordEncoder();
+		return new BCryptPasswordEncoder(12);
 	}
 
 	//Cors filter to accept incoming requests

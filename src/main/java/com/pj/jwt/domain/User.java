@@ -1,5 +1,6 @@
 package com.pj.jwt.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -12,14 +13,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 
 @Entity
 @Data
-@Table(name = "`user`")
-public class User
+@Table(name = "core_user")
+public class User implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -52,6 +55,7 @@ public class User
 			joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
 			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
 	)
+	@JsonManagedReference
 	private Set<Role> roles=new HashSet<>();
 
 	public User()
@@ -74,5 +78,28 @@ public class User
 				", active=" + active +
 				", password='" + password + '\'' +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		User user = (User) o;
+		return id.equals(user.id) &&
+				username.equals(user.username) &&
+				Objects.equals(active, user.active) &&
+				Objects.equals(credentialsNonExpired, user.credentialsNonExpired) &&
+				Objects.equals(accountNonLocked, user.accountNonLocked) &&
+				Objects.equals(accountNonExpired, user.accountNonExpired) &&
+				Objects.equals(password, user.password);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(id, username, active, credentialsNonExpired, accountNonLocked, accountNonExpired, password);
 	}
 }

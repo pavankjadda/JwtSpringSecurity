@@ -1,7 +1,7 @@
 package com.pj.jwt.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -30,21 +32,11 @@ public class Role implements Serializable
 	private String name;
 
 	@ManyToMany(mappedBy = "roles")
-	@JsonIgnore
-	private Set<User> users;
+	@JsonBackReference
+	private Set<User> users=new HashSet<>();
 
 	public Role()
 	{
-	}
-
-	public Role(String name)
-	{
-		this.name = name;
-	}
-
-	public Role(String name, Set<User> users)
-	{
-		this.name = name;
 	}
 
 	@Override
@@ -54,5 +46,23 @@ public class Role implements Serializable
 				"id=" + id +
 				", name='" + name + '\'' +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Role role = (Role) o;
+		return id.equals(role.id) &&
+				name.equals(role.name);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(id, name);
 	}
 }
