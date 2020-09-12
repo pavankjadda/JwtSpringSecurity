@@ -16,13 +16,9 @@ import org.springframework.util.Assert;
 public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider
 {
 	private static final String USER_NOT_FOUND_MESSAGE = "userNotFoundPassword";
-
 	private volatile String userNotFoundEncodedPassword;
-
 	private PasswordEncoder passwordEncoder;
-
 	private UserDetailsService myUserDetailsService;
-
 	private UserDetailsPasswordService userDetailsPasswordService;
 
 
@@ -114,23 +110,24 @@ public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenti
 		}
 	}
 
+	/**
+	 * Different response times when providing existing and non-existing usernames allows attacker to know about existing users. It could make it easier for an attacker to test for existing usernames.
+	 * This method helps to generalize the response for both the cases
+	 *
+	 * @param usernamePasswordAuthenticationToken Username Password Authentication Token
+	 */
 	/*Different response times when providing existing and non-existing usernames allows attacker to know about existing users. It could make it easier for an attacker to test for existing usernames.
 	  This method helps to generalize the response for both the cases
 	*/
-	private void mitigateAgainstTimingAttack(UsernamePasswordAuthenticationToken authentication)
+	private void mitigateAgainstTimingAttack(UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken)
 	{
-		if (authentication.getCredentials() != null)
+		if (usernamePasswordAuthenticationToken.getCredentials() != null)
 		{
-			String presentedPassword = authentication.getCredentials().toString();
+			String presentedPassword = usernamePasswordAuthenticationToken.getCredentials().toString();
 			this.passwordEncoder.matches(presentedPassword, this.userNotFoundEncodedPassword);
 			throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials",
 					"Message: Authentication failed: Can not find Username "));
 		}
-	}
-
-	protected PasswordEncoder getPasswordEncoder()
-	{
-		return passwordEncoder;
 	}
 
 
@@ -141,18 +138,9 @@ public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenti
 		this.userNotFoundEncodedPassword = null;
 	}
 
-	protected UserDetailsService getUserDetailsService()
-	{
-		return myUserDetailsService;
-	}
-
 	public void setUserDetailsService(UserDetailsService userDetailsService)
 	{
 		this.myUserDetailsService = userDetailsService;
 	}
 
-	public void setUserDetailsPasswordService(UserDetailsPasswordService userDetailsPasswordService)
-	{
-		this.userDetailsPasswordService = userDetailsPasswordService;
-	}
 }

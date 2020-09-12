@@ -1,20 +1,37 @@
 package com.pj.jwt.security;
 
 
-import org.springframework.beans.factory.annotation.Value;
+import com.pj.jwt.config.CoreProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * JWT utility class that issues and validates JWT tokens
+ *
+ * @author Pavan Jadda
+ * @version 1.0.0
+ */
 @Service
+@Transactional
 public class JwtUtil
 {
-	@Value(value = "${jwtSecret}")
-	private String jwtSecret;
+	private final CoreProperties coreProperties;
+
+	public JwtUtil(CoreProperties coreProperties)
+	{
+		this.coreProperties = coreProperties;
+	}
 
 	public String extractUsername(String token)
 	{
@@ -28,7 +45,12 @@ public class JwtUtil
 
 	private Claims extractAllClaims(String token)
 	{
-		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+		return Jwts.parserBuilder()
+				.setSigningKey(Keys.hmacShaKeyFor(coreProperties.getJwtSecret().getBytes(StandardCharsets.UTF_8)))
+				.requireAudience("string")
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
 	}
 
 	private boolean isTokenExpired(String token)
@@ -52,7 +74,7 @@ public class JwtUtil
 	{
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-				.signWith(SignatureAlgorithm.HS256, jwtSecret).compact();
+				.signWith(Keys.hmacShaKeyFor(coreProperties.getJwtSecret().getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256).compact();
 	}
 
 	public boolean validateToken(String token, UserDetails userDetails)

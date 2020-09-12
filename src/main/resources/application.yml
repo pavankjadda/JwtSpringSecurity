@@ -1,4 +1,4 @@
-jwtSecret: "Test Secret"
+
 
 spring:
   datasource:
@@ -13,3 +13,6 @@ spring:
   h2:
     console:
       enabled: true
+
+core:
+  jwt-secret: "Test Secret"
