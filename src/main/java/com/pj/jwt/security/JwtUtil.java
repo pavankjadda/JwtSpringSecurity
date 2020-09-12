@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class JwtUtil
 	private Claims extractAllClaims(String token)
 	{
 		return Jwts.parserBuilder()
-				.setSigningKey(Keys.hmacShaKeyFor(coreProperties.getJwtSecret().getBytes(StandardCharsets.UTF_8)))
+				.setSigningKey(Keys.secretKeyFor(SignatureAlgorithm.HS512))
 				.requireAudience("string")
 				.build()
 				.parseClaimsJws(token)
@@ -74,7 +73,7 @@ public class JwtUtil
 	{
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-				.signWith(Keys.hmacShaKeyFor(coreProperties.getJwtSecret().getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256).compact();
+				.signWith(Keys.secretKeyFor( SignatureAlgorithm.HS512), SignatureAlgorithm.HS512).compact();
 	}
 
 	public boolean validateToken(String token, UserDetails userDetails)

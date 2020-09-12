@@ -2,7 +2,9 @@ import {Component, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {NgxSpinnerService} from "ngx-spinner";
+import {LOGIN_API_URL} from "src/app/constants/app.constants";
 import {AuthService} from "src/app/core/auth/auth.service";
+import {environment} from "src/environments/environment";
 
 @Component({
   selector: "app-login",
@@ -55,32 +57,36 @@ export class LoginComponent implements OnInit
   login()
   {
     this.spinner.show();
-    this.authService
-        .login(this.f.username.value, this.f.password.value)
-        .subscribe(
-          (response) =>
-          {
-            if (response["token"] && this.authService.isUserLoggedIn())
-            {
-              this.router.navigate(["/home"]);
-            }
-            else
-            {
-              localStorage.removeItem("currentUser");
-              this.router.navigate(["/login"]);
-            }
-          },
-          (error) =>
-          {
-            console.log(error);
-            this.loginFailed = true;
-            this.spinner.hide();
-          },
-          () =>
-          {
-            this.spinner.hide();
-          }
-        );
+
+    let formData = new FormData();
+    formData.append("username", this.f.username.value);
+    formData.append("password", this.f.password.value);
+    let url = environment.BASE_URL + LOGIN_API_URL + "/login";
+
+    this.authService.login(url, formData).subscribe(
+      (response) =>
+      {
+        if (response["token"] && this.authService.isUserLoggedIn())
+        {
+          this.router.navigate(["/home"]);
+        }
+        else
+        {
+          localStorage.removeItem("currentUser");
+          this.router.navigate(["/login"]);
+        }
+      },
+      (error) =>
+      {
+        console.log(error);
+        this.loginFailed = true;
+        this.spinner.hide();
+      },
+      () =>
+      {
+        this.spinner.hide();
+      }
+    );
   }
 
   logout()
