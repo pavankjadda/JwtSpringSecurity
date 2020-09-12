@@ -28,8 +28,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         if (err.status === 404) {
           console.log("Inside ErrorInterceptor, Http Status: 404");
-          //this.authService.logout();
-          //this.router.navigate( ['/login'] );
+
         }
         if (err.status === 500) {
           console.log("Inside ErrorInterceptor, Http Status: 500");
@@ -37,9 +36,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
         if (err.status === 0 || err.statusText === "Unknown Error") {
           console.log("Inside ErrorInterceptor, Http Status: Unknown Error");
-          alert(
-            "Unknown Error occurred, failed to reach backend server, Please try again"
-          );
+
         }
 
         let error = err.error.message || err.error;

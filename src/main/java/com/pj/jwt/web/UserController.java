@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
@@ -42,9 +43,9 @@ public class UserController
 	}
 
 	@PostMapping(value = {"/authenticate","/login"})
-	public Object loginUser(@RequestBody LoginRequest loginRequest)
+	public Object loginUser(@RequestParam String username, @RequestParam String password)
 	{
-		Authentication authentication=authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+		Authentication authentication=authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(username, password));
 		return mapUserAndReturnJwtToken(authentication,true);
 	}
 

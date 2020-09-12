@@ -1,8 +1,8 @@
-import {Role} from "src/app/core/model/role";
+import {Authority} from 'src/app/core/model/authority';
 
 export class User {
   id: number;
   username: string;
-  roles: Role;
+  authorities: Authority[];
   token: string;
 }

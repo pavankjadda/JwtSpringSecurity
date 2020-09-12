@@ -2,6 +2,7 @@ import {CommonModule} from '@angular/common';
 import {HttpClientModule} from '@angular/common/http';
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
@@ -39,6 +40,7 @@ import {MainComponent} from './layout/main/main.component';
     MatSidenavModule,
     MatToolbarModule,
     MatIconModule,
+    MatButtonModule,
     NgxSpinnerModule,
     AppRoutingModule,
   ],
