@@ -8,20 +8,20 @@ import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails
 {
-	private User user;
+	private final User user;
 
-	private Collection<? extends GrantedAuthority> roles;
+	private final Collection<? extends GrantedAuthority> grantedAuthorities;
 
-	public CustomUserDetails(User user, Collection<? extends GrantedAuthority> roles)
+	public CustomUserDetails(User user, Collection<? extends GrantedAuthority> grantedAuthorities)
 	{
 		this.user = user;
-		this.roles = roles;
+		this.grantedAuthorities = grantedAuthorities;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities()
 	{
-		return roles;
+		return grantedAuthorities;
 	}
 
 	@Override

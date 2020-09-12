@@ -50,23 +50,23 @@ public class UserController
 
 	private UserDTO mapUserAndReturnJwtToken(Authentication authentication, boolean generateToken)
 	{
-		CustomUserDetails customUserDetails= (CustomUserDetails) authentication.getPrincipal();
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-		UserDTO userDTO=new UserDTO();
+		UserDTO userDTO = new UserDTO();
 		userDTO.setUsername(customUserDetails.getUsername());
 		userDTO.setEnabled(customUserDetails.isEnabled());
 		userDTO.setAccountNonExpired(customUserDetails.isAccountNonExpired());
 		userDTO.setAccountNonLocked(customUserDetails.isAccountNonLocked());
 		userDTO.setCredentialsNonExpired(customUserDetails.isCredentialsNonExpired());
-		userDTO.setAuthorities(mapAuthorities((Collection<GrantedAuthority>) customUserDetails.getAuthorities()));
-		if(generateToken)
+		userDTO.setAuthorities(mapAuthorities(customUserDetails.getAuthorities()));
+		if (generateToken)
 			userDTO.setToken(jwtUtil.generateToken(customUserDetails));
 		return userDTO;
 	}
 
-	private Set<AuthorityDTO> mapAuthorities(Collection<GrantedAuthority> authorities)
+	private Set<AuthorityDTO> mapAuthorities(Collection<? extends GrantedAuthority> authorities)
 	{
-		Set<AuthorityDTO> authorityDTOList=new HashSet<>();
+		Set<AuthorityDTO> authorityDTOList = new HashSet<>();
 		authorities.forEach(grantedAuthority -> authorityDTOList.add(new AuthorityDTO(grantedAuthority.getAuthority())));
 		return authorityDTOList;
 	}
