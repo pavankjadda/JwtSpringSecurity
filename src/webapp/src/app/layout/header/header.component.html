@@ -3,7 +3,11 @@
 
   <span class="header-spacer"></span>
 
-  <button  class="example-icon" aria-label="Example icon-button with share icon">
-    <mat-icon>share</mat-icon>
-  </button>
+  <a routerLink="/login" class="example-icon" aria-label="Example icon-button with share icon">
+    <mat-icon>Login</mat-icon>
+  </a>
+
+  <a  routerLink="/login" *ngIf="authService.isUserLoggedIn()" class="example-icon" aria-label="Example icon-button with share icon">
+    <mat-icon>Logout</mat-icon>
+  </a>
 </mat-toolbar>
