@@ -6,6 +6,7 @@ import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {NgxSpinnerModule} from "ngx-spinner/lib/ngx-spinner.module";
 import {AppRoutingModule} from "./app-routing.module";
 import {AppComponent} from "./app.component";
 import {HomeComponent} from "./core/home/home.component";
@@ -29,7 +30,8 @@ import {HeaderComponent} from "./layout/header/header.component";
     ReactiveFormsModule,
     MatSidenavModule,
     MatToolbarModule,
-    MatIconModule
+    MatIconModule,
+    NgxSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]
