@@ -16,5 +16,5 @@ spring:
       enabled: true
 
 core:
-  jwt-secret: "Test Secret"
+  jwt-secret: "SecretKeyToGenJWTsSecretKeyToGenJWTsSecretKeyToGenJWTsSecretKeyToGenJWTs"
 
