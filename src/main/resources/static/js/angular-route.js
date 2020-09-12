@@ -1,6 +1,6 @@
 /*
- AngularJS v1.7.7
- (c) 2010-2018 Google, Inc. http://angularjs.org
+ AngularJS v1.8.0
+ (c) 2010-2020 Google, Inc. http://angularjs.org
  License: MIT
 */
 (function (I, b) {
@@ -77,7 +77,7 @@
         }
     }
 
-    var D, E, F, G, y = b.module("ngRoute", []).info({angularVersion: "1.7.7"}).provider("$route", function () {
+    var D, E, F, G, y = b.module("ngRoute", []).info({angularVersion: "1.8.0"}).provider("$route", function () {
         function u(d,
                    c) {
             return b.extend(Object.create(d), c)
