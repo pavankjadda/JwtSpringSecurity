@@ -1,6 +1,5 @@
 package com.pj.jwt.web;
 
-import com.pj.jwt.domain.LoginRequest;
 import com.pj.jwt.dto.AuthorityDTO;
 import com.pj.jwt.dto.UserDTO;
 import com.pj.jwt.security.CustomUserDetails;
@@ -12,7 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,13 +35,13 @@ public class UserController
 	}
 
 	@GetMapping(value = {"/get_logged_in_user", "/home"})
-	public Object getLoggedInUser(HttpServletRequest request)
+	public UserDTO getLoggedInUser()
 	{
-		return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return mapUserAndReturnJwtToken(SecurityContextHolder.getContext().getAuthentication(), false);
 	}
 
 	@PostMapping(value = {"/authenticate","/login"})
-	public Object loginUser(@RequestParam String username, @RequestParam String password)
+	public UserDTO loginUser(@RequestParam String username, @RequestParam String password)
 	{
 		Authentication authentication=authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(username, password));
 		return mapUserAndReturnJwtToken(authentication,true);
@@ -61,7 +59,11 @@ public class UserController
 		userDTO.setCredentialsNonExpired(customUserDetails.isCredentialsNonExpired());
 		userDTO.setAuthorities(mapAuthorities(customUserDetails.getAuthorities()));
 		if (generateToken)
-			userDTO.setToken(jwtUtil.generateToken(customUserDetails));
+		{
+			String jwtToken=jwtUtil.generateToken(customUserDetails);
+			userDTO.setToken(jwtToken);
+			userDTO.setTimeBeforeExpiration(jwtUtil.extractExpiration(jwtToken));
+		}
 		return userDTO;
 	}
 
