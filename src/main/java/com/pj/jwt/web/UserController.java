@@ -4,6 +4,7 @@ import com.pj.jwt.dto.AuthorityDTO;
 import com.pj.jwt.dto.UserDTO;
 import com.pj.jwt.security.CustomUserDetails;
 import com.pj.jwt.security.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,12 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/user")
+@Slf4j
 public class UserController
 {
 	private final AuthenticationManager authenticationManager;
@@ -70,6 +73,7 @@ public class UserController
 	@PostMapping(value = {"/authenticate", "/login"})
 	public UserDTO loginUser(@RequestParam String username, @RequestParam String password)
 	{
+		log.info("Login attempted at {} from User:{} ", Instant.now(), username);
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		return mapUserAndReturnJwtToken(authentication, true);
 	}
