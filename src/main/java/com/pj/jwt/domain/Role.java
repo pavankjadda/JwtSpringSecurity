@@ -2,7 +2,6 @@ package com.pj.jwt.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +16,6 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Data
 @Table(name = "role")
 public class Role implements Serializable
 {
@@ -64,5 +62,35 @@ public class Role implements Serializable
 				"id=" + id +
 				", name='" + name + '\'' +
 				'}';
+	}
+
+	public Long getId()
+	{
+		return this.id;
+	}
+
+	public String getName()
+	{
+		return this.name;
+	}
+
+	public Set<User> getUsers()
+	{
+		return this.users;
+	}
+
+	public void setId(Long id)
+	{
+		this.id = id;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public void setUsers(Set<User> users)
+	{
+		this.users = users;
 	}
 }

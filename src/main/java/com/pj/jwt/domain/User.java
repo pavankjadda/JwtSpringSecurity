@@ -1,7 +1,6 @@
 package com.pj.jwt.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,7 +19,6 @@ import java.util.Set;
 
 
 @Entity
-@Data
 @Table(name = "core_user")
 public class User implements Serializable
 {
@@ -101,5 +99,85 @@ public class User implements Serializable
 				", active=" + active +
 				", password='" + password + '\'' +
 				'}';
+	}
+
+	public Long getId()
+	{
+		return this.id;
+	}
+
+	public String getUsername()
+	{
+		return this.username;
+	}
+
+	public Boolean getActive()
+	{
+		return this.active;
+	}
+
+	public Boolean getCredentialsNonExpired()
+	{
+		return this.credentialsNonExpired;
+	}
+
+	public Boolean getAccountNonLocked()
+	{
+		return this.accountNonLocked;
+	}
+
+	public Boolean getAccountNonExpired()
+	{
+		return this.accountNonExpired;
+	}
+
+	public String getPassword()
+	{
+		return this.password;
+	}
+
+	public Set<Role> getRoles()
+	{
+		return this.roles;
+	}
+
+	public void setId(Long id)
+	{
+		this.id = id;
+	}
+
+	public void setUsername(String username)
+	{
+		this.username = username;
+	}
+
+	public void setActive(Boolean active)
+	{
+		this.active = active;
+	}
+
+	public void setCredentialsNonExpired(Boolean credentialsNonExpired)
+	{
+		this.credentialsNonExpired = credentialsNonExpired;
+	}
+
+	public void setAccountNonLocked(Boolean accountNonLocked)
+	{
+		this.accountNonLocked = accountNonLocked;
+	}
+
+	public void setAccountNonExpired(Boolean accountNonExpired)
+	{
+		this.accountNonExpired = accountNonExpired;
+	}
+
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
+
+	public void setRoles(Set<Role> roles)
+	{
+		this.roles = roles;
 	}
 }
