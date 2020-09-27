@@ -27,6 +27,13 @@ public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenti
 		setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
 	}
 
+	public void setPasswordEncoder(PasswordEncoder passwordEncoder)
+	{
+		Assert.notNull(passwordEncoder, "passwordEncoder cannot be null");
+		this.passwordEncoder = passwordEncoder;
+		this.userNotFoundEncodedPassword = null;
+	}
+
 	/* Validate Password against Database */
 	protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication)
 	{
@@ -48,6 +55,25 @@ public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenti
 			logger.debug("Authentication failed: password does not match stored value");
 			throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Message: Authentication failed: password does not match stored value"));
 		}
+	}
+
+	/**
+	 * Creates a successful {@link Authentication} object.
+	 * Subclasses will usually store the original credentials the user supplied (not
+	 * salted or encoded passwords) in the returned <code>Authentication</code> object.
+	 * </p>
+	 */
+	@Override
+	protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user)
+	{
+		boolean upgradeEncoding = this.userDetailsPasswordService != null && this.passwordEncoder.upgradeEncoding(user.getPassword());
+		if (upgradeEncoding)
+		{
+			String presentedPassword = authentication.getCredentials().toString();
+			String newPassword = this.passwordEncoder.encode(presentedPassword);
+			user = this.userDetailsPasswordService.updatePassword(user, newPassword);
+		}
+		return super.createSuccessAuthentication(principal, authentication, user);
 	}
 
 	@Override
@@ -83,25 +109,6 @@ public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenti
 		}
 	}
 
-	/**
-	 * Creates a successful {@link Authentication} object.
-	 * Subclasses will usually store the original credentials the user supplied (not
-	 * salted or encoded passwords) in the returned <code>Authentication</code> object.
-	 * </p>
-	 */
-	@Override
-	protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user)
-	{
-		boolean upgradeEncoding = this.userDetailsPasswordService != null && this.passwordEncoder.upgradeEncoding(user.getPassword());
-		if (upgradeEncoding)
-		{
-			String presentedPassword = authentication.getCredentials().toString();
-			String newPassword = this.passwordEncoder.encode(presentedPassword);
-			user = this.userDetailsPasswordService.updatePassword(user, newPassword);
-		}
-		return super.createSuccessAuthentication(principal, authentication, user);
-	}
-
 	private void prepareTimingAttackProtection()
 	{
 		if (this.userNotFoundEncodedPassword == null)
@@ -128,14 +135,6 @@ public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenti
 			throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials",
 					"Message: Authentication failed: Can not find Username "));
 		}
-	}
-
-
-	public void setPasswordEncoder(PasswordEncoder passwordEncoder)
-	{
-		Assert.notNull(passwordEncoder, "passwordEncoder cannot be null");
-		this.passwordEncoder = passwordEncoder;
-		this.userNotFoundEncodedPassword = null;
 	}
 
 	public void setUserDetailsService(UserDetailsService userDetailsService)

@@ -28,7 +28,7 @@ public class UserController
 	private final AuthenticationManager authenticationManager;
 	private final JwtUtil jwtUtil;
 
-	public UserController( AuthenticationManager authenticationManager, JwtUtil jwtUtil)
+	public UserController(AuthenticationManager authenticationManager, JwtUtil jwtUtil)
 	{
 		this.authenticationManager = authenticationManager;
 		this.jwtUtil = jwtUtil;
@@ -38,13 +38,6 @@ public class UserController
 	public UserDTO getLoggedInUser()
 	{
 		return mapUserAndReturnJwtToken(SecurityContextHolder.getContext().getAuthentication(), false);
-	}
-
-	@PostMapping(value = {"/authenticate","/login"})
-	public UserDTO loginUser(@RequestParam String username, @RequestParam String password)
-	{
-		Authentication authentication=authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(username, password));
-		return mapUserAndReturnJwtToken(authentication,true);
 	}
 
 	private UserDTO mapUserAndReturnJwtToken(Authentication authentication, boolean generateToken)
@@ -60,7 +53,7 @@ public class UserController
 		userDTO.setAuthorities(mapAuthorities(customUserDetails.getAuthorities()));
 		if (generateToken)
 		{
-			String jwtToken=jwtUtil.generateToken(customUserDetails);
+			String jwtToken = jwtUtil.generateToken(customUserDetails);
 			userDTO.setToken(jwtToken);
 			userDTO.setTimeBeforeExpiration(jwtUtil.extractExpiration(jwtToken));
 		}
@@ -72,6 +65,13 @@ public class UserController
 		Set<AuthorityDTO> authorityDTOList = new HashSet<>();
 		authorities.forEach(grantedAuthority -> authorityDTOList.add(new AuthorityDTO(grantedAuthority.getAuthority())));
 		return authorityDTOList;
+	}
+
+	@PostMapping(value = {"/authenticate", "/login"})
+	public UserDTO loginUser(@RequestParam String username, @RequestParam String password)
+	{
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		return mapUserAndReturnJwtToken(authentication, true);
 	}
 
 	@GetMapping("/logout")

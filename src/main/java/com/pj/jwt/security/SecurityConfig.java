@@ -34,30 +34,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 	}
 
 	@Override
-	public void configure(WebSecurity webSecurity)
-	{
-		webSecurity.ignoring().antMatchers("/static/**");
-	}
-
-	@Override
-	public void configure(HttpSecurity http) throws Exception
-	{
-		http.authorizeRequests()
-				.antMatchers("/api/v1/user/login","/api/v1/user/authenticate", "/api/v1/user/logout","/h2-console/**").permitAll()
-				.anyRequest().authenticated()
-				.and()
-				.httpBasic()
-				.and()
-				.logout().invalidateHttpSession(true).clearAuthentication(true)
-				.and().headers().frameOptions().sameOrigin();
-
-		http.csrf().disable();
-		http.cors();
-		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-	}
-
-	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception
 	{
 		auth.authenticationProvider(getDaoAuthenticationProvider());
@@ -78,6 +54,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 		return new BCryptPasswordEncoder(12);
 	}
 
+	@Bean(BeanIds.AUTHENTICATION_MANAGER)
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception
+	{
+		return super.authenticationManagerBean();
+	}
+
+	@Override
+	public void configure(WebSecurity webSecurity)
+	{
+		webSecurity.ignoring().antMatchers("/static/**");
+	}
+
+	@Override
+	public void configure(HttpSecurity http) throws Exception
+	{
+		http.authorizeRequests()
+				.antMatchers("/api/v1/user/login", "/api/v1/user/authenticate", "/api/v1/user/logout", "/h2-console/**").permitAll()
+				.anyRequest().authenticated()
+				.and()
+				.httpBasic()
+				.and()
+				.logout().invalidateHttpSession(true).clearAuthentication(true)
+				.and().headers().frameOptions().sameOrigin();
+
+		http.csrf().disable();
+		http.cors();
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+	}
+
 	//Cors filter to accept incoming requests
 	@Bean
 	CorsConfigurationSource corsConfigurationSource()
@@ -89,11 +96,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
-	}
-
-	@Bean(BeanIds.AUTHENTICATION_MANAGER)
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
 	}
 }

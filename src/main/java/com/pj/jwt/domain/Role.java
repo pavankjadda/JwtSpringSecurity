@@ -33,19 +33,10 @@ public class Role implements Serializable
 
 	@ManyToMany(mappedBy = "roles")
 	@JsonBackReference
-	private Set<User> users=new HashSet<>();
+	private Set<User> users = new HashSet<>();
 
 	public Role()
 	{
-	}
-
-	@Override
-	public String toString()
-	{
-		return "Role{" +
-				"id=" + id +
-				", name='" + name + '\'' +
-				'}';
 	}
 
 	@Override
@@ -64,5 +55,14 @@ public class Role implements Serializable
 	public int hashCode()
 	{
 		return Objects.hash(id, name);
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Role{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				'}';
 	}
 }

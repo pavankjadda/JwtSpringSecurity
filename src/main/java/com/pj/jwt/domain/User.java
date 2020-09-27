@@ -56,7 +56,7 @@ public class User implements Serializable
 			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
 	)
 	@JsonManagedReference
-	private Set<Role> roles=new HashSet<>();
+	private Set<Role> roles = new HashSet<>();
 
 	public User()
 	{
@@ -67,17 +67,6 @@ public class User implements Serializable
 		this.username = username;
 		this.password = password;
 		this.active = active;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "User{" +
-				"id=" + id +
-				", username='" + username + '\'' +
-				", active=" + active +
-				", password='" + password + '\'' +
-				'}';
 	}
 
 	@Override
@@ -101,5 +90,16 @@ public class User implements Serializable
 	public int hashCode()
 	{
 		return Objects.hash(id, username, active, credentialsNonExpired, accountNonLocked, accountNonExpired, password);
+	}
+
+	@Override
+	public String toString()
+	{
+		return "User{" +
+				"id=" + id +
+				", username='" + username + '\'' +
+				", active=" + active +
+				", password='" + password + '\'' +
+				'}';
 	}
 }

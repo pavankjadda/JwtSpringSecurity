@@ -9,6 +9,6 @@ public class AuthorityDTO
 
 	public AuthorityDTO(String authority)
 	{
-		this.authority=authority;
+		this.authority = authority;
 	}
 }
