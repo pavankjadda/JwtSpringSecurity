@@ -1,5 +1,4 @@
-export class Authority
-{
-  id: number;
-  name: string;
+export class Authority {
+	id: number;
+	name: string;
 }

@@ -12,8 +12,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,9 +64,16 @@ public class UserController {
     }
 
     @PostMapping(value = {"/authenticate", "/login"})
-    public UserDTO loginUser(@RequestParam String username, @RequestParam String password) {
-        //log.info("Login attempted at {} from User:{} ", Instant.now(), username);
-        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+    public UserDTO loginUser(HttpServletRequest request) {
+        // Get the username and password from the request headers
+        var authHeader = request.getHeader("Authorization");
+        var decodedAuth = new String(Base64.getDecoder().decode(authHeader.substring(6)));
+
+        // Decode the base64 string
+        String[] credentials = decodedAuth.split(":");
+
+        // Authenticate the user
+        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentials[0], credentials[1]));
         return mapUserAndReturnJwtToken(authentication, true);
     }
 
