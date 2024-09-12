@@ -1,4 +1,4 @@
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Injectable} from "@angular/core";
 import {CookieService} from "ngx-cookie-service";
 import {Observable} from "rxjs";
@@ -34,20 +34,20 @@ export class AuthService
   login(url: string, formData: FormData)
   {
     return this.httpClient.post<User>(url, formData)
-               .pipe(
-                 map((user) =>
-                 {
-                   // login successful if there's a Spring Session token in the response
-                   if (user && user.token)
-                   {
-                     // store user details and Spring Session token as cookies
-                     this.cookieService.set("currentUser", JSON.stringify(user));
-                     this.cookieService.set("jwtToken", user.token);
-                     this.cookieService.set("isLoggedIn", "true");
-                   }
-                   return user;
-                 })
-               );
+      .pipe(
+        map((user) =>
+        {
+          // login successful if there's a Spring Session token in the response
+          if (user && user.token)
+          {
+            // store user details and Spring Session token as cookies
+            this.cookieService.set("currentUser", JSON.stringify(user));
+            this.cookieService.set("jwtToken", user.token);
+            this.cookieService.set("isLoggedIn", "true");
+          }
+          return user;
+        })
+      );
   }
 
   logout()

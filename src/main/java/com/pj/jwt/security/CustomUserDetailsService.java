@@ -14,31 +14,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService
-{
-	private final UserRepository userRepository;
+public class CustomUserDetailsService implements UserDetailsService {
+    private final UserRepository userRepository;
 
-	public CustomUserDetailsService(UserRepository userRepository)
-	{
-		this.userRepository = userRepository;
-	}
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-	@Override
-	public UserDetails loadUserByUsername(String username)
-	{
-		User user = userRepository.findByUsername(username);
-		if (user == null)
-			throw new UsernameNotFoundException("Could not find Username");
-		return new CustomUserDetails(user, getGrantedAuthorities(user.getRoles()));
-	}
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null)
+            throw new UsernameNotFoundException("Could not find Username");
+        return new CustomUserDetails(user, getGrantedAuthorities(user.getRoles()));
+    }
 
-	private Set<GrantedAuthority> getGrantedAuthorities(Set<Role> roles)
-	{
-		Set<GrantedAuthority> authorities = new HashSet<>();
-		for (Role role : roles)
-		{
-			authorities.add(new SimpleGrantedAuthority(role.getName()));
-		}
-		return authorities;
-	}
+    private Set<GrantedAuthority> getGrantedAuthorities(Set<Role> roles) {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
+        return authorities;
+    }
 }

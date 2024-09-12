@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NgxSpinnerService} from 'ngx-spinner';
-import {LOGIN_API_URL, USER_API_URL} from 'src/app/constants/app.constants';
+import {USER_API_URL} from 'src/app/constants/app.constants';
 import {AuthService} from 'src/app/core/auth/auth.service';
 import {environment} from 'src/environments/environment';
 

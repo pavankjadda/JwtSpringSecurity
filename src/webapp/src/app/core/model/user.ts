@@ -1,6 +1,7 @@
 import {Authority} from 'src/app/core/model/authority';
 
-export class User {
+export class User
+{
   id: number;
   username: string;
   authorities: Authority[];

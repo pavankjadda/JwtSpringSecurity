@@ -13,133 +13,110 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
-public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider
-{
-	private static final String USER_NOT_FOUND_MESSAGE = "userNotFoundPassword";
-	private volatile String userNotFoundEncodedPassword;
-	private PasswordEncoder passwordEncoder;
-	private UserDetailsService myUserDetailsService;
-	private UserDetailsPasswordService userDetailsPasswordService;
+public class CustomDaoAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+    private static final String USER_NOT_FOUND_MESSAGE = "userNotFoundPassword";
+    private volatile String userNotFoundEncodedPassword;
+    private PasswordEncoder passwordEncoder;
+    private UserDetailsService myUserDetailsService;
+    private UserDetailsPasswordService userDetailsPasswordService;
 
+    public CustomDaoAuthenticationProvider() {
+        setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
+    }
 
-	public CustomDaoAuthenticationProvider()
-	{
-		setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
-	}
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        Assert.notNull(passwordEncoder, "passwordEncoder cannot be null");
+        this.passwordEncoder = passwordEncoder;
+        this.userNotFoundEncodedPassword = null;
+    }
 
-	public void setPasswordEncoder(PasswordEncoder passwordEncoder)
-	{
-		Assert.notNull(passwordEncoder, "passwordEncoder cannot be null");
-		this.passwordEncoder = passwordEncoder;
-		this.userNotFoundEncodedPassword = null;
-	}
+    /* Validate Password against Database */
+    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) {
+        if (authentication.getCredentials() == null) {
+            logger.debug("Authentication failed: no credentials provided");
+            throw new BadCredentialsException(
+                    messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Message: Authentication failed: no credentials provided"));
+        }
 
-	/* Validate Password against Database */
-	protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication)
-	{
-		if (authentication.getCredentials() == null)
-		{
-			logger.debug("Authentication failed: no credentials provided");
-			throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Message: Authentication failed: no credentials provided"));
-		}
+        var presentedPassword = authentication.getCredentials().toString();
 
-		String presentedPassword = authentication.getCredentials().toString();
+        if (presentedPassword.isEmpty()) {
+            logger.debug("Authentication failed: password is empty");
+            throw new BadCredentialsException(
+                    messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Message: Authentication failed: Password is Empty"));
+        } else if (!passwordEncoder.matches(presentedPassword, userDetails.getPassword())) {
+            logger.debug("Authentication failed: password does not match stored value");
+            throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials",
+                    "Message: Authentication failed: password does not match stored value"));
+        }
+    }
 
-		if (presentedPassword.equals(""))
-		{
-			logger.debug("Authentication failed: password is empty");
-			throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Message: Authentication failed: Password is Empty"));
-		}
-		else if (!passwordEncoder.matches(presentedPassword, userDetails.getPassword()))
-		{
-			logger.debug("Authentication failed: password does not match stored value");
-			throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Message: Authentication failed: password does not match stored value"));
-		}
-	}
+    /**
+     * Creates a successful {@link Authentication} object.
+     * Subclasses will usually store the original credentials the user supplied (not
+     * salted or encoded passwords) in the returned <code>Authentication</code> object.
+     * </p>
+     */
+    @Override
+    protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user) {
+        boolean upgradeEncoding = this.userDetailsPasswordService != null && this.passwordEncoder.upgradeEncoding(user.getPassword());
+        if (upgradeEncoding) {
+            String presentedPassword = authentication.getCredentials().toString();
+            String newPassword = this.passwordEncoder.encode(presentedPassword);
+            user = this.userDetailsPasswordService.updatePassword(user, newPassword);
+        }
+        return super.createSuccessAuthentication(principal, authentication, user);
+    }
 
-	/**
-	 * Creates a successful {@link Authentication} object.
-	 * Subclasses will usually store the original credentials the user supplied (not
-	 * salted or encoded passwords) in the returned <code>Authentication</code> object.
-	 * </p>
-	 */
-	@Override
-	protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user)
-	{
-		boolean upgradeEncoding = this.userDetailsPasswordService != null && this.passwordEncoder.upgradeEncoding(user.getPassword());
-		if (upgradeEncoding)
-		{
-			String presentedPassword = authentication.getCredentials().toString();
-			String newPassword = this.passwordEncoder.encode(presentedPassword);
-			user = this.userDetailsPasswordService.updatePassword(user, newPassword);
-		}
-		return super.createSuccessAuthentication(principal, authentication, user);
-	}
+    @Override
+    protected void doAfterPropertiesSet() {
+        Assert.notNull(myUserDetailsService, "A UserDetailsService must be set");
+    }
 
-	@Override
-	protected void doAfterPropertiesSet()
-	{
-		Assert.notNull(myUserDetailsService, "A UserDetailsService must be set");
-	}
+    protected final UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) {
+        prepareTimingAttackProtection();
+        try {
+            var loadedUser = myUserDetailsService.loadUserByUsername(username);
+            if (loadedUser == null) {
+                throw new InternalAuthenticationServiceException("UserDetailsService returned null, which is an interface contract violation");
+            }
+            return loadedUser;
+        } catch (UsernameNotFoundException ex) {
+            mitigateAgainstTimingAttack(authentication);
+            throw ex;
+        } catch (InternalAuthenticationServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new InternalAuthenticationServiceException(ex.getMessage(), ex);
+        }
+    }
 
-	protected final UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication)
-	{
-		prepareTimingAttackProtection();
-		try
-		{
-			UserDetails loadedUser = myUserDetailsService.loadUserByUsername(username);
-			if (loadedUser == null)
-			{
-				throw new InternalAuthenticationServiceException("UserDetailsService returned null, which is an interface contract violation");
-			}
-			return loadedUser;
-		}
-		catch (UsernameNotFoundException ex)
-		{
-			mitigateAgainstTimingAttack(authentication);
-			throw ex;
-		}
-		catch (InternalAuthenticationServiceException ex)
-		{
-			throw ex;
-		}
-		catch (Exception ex)
-		{
-			throw new InternalAuthenticationServiceException(ex.getMessage(), ex);
-		}
-	}
+    private void prepareTimingAttackProtection() {
+        if (this.userNotFoundEncodedPassword == null) {
+            this.userNotFoundEncodedPassword = this.passwordEncoder.encode(USER_NOT_FOUND_MESSAGE);
+        }
+    }
 
-	private void prepareTimingAttackProtection()
-	{
-		if (this.userNotFoundEncodedPassword == null)
-		{
-			this.userNotFoundEncodedPassword = this.passwordEncoder.encode(USER_NOT_FOUND_MESSAGE);
-		}
-	}
-
-	/**
-	 * Different response times when providing existing and non-existing usernames allows attacker to know about existing users. It could make it easier for an attacker to test for existing usernames.
-	 * This method helps to generalize the response for both the cases
-	 *
-	 * @param usernamePasswordAuthenticationToken Username Password Authentication Token
-	 */
+    /**
+     * Different response times when providing existing and non-existing usernames allows attacker to know about existing users. It could make it easier for an attacker to test for existing usernames.
+     * This method helps to generalize the response for both the cases
+     *
+     * @param usernamePasswordAuthenticationToken Username Password Authentication Token
+     */
 	/*Different response times when providing existing and non-existing usernames allows attacker to know about existing users. It could make it easier for an attacker to test for existing usernames.
 	  This method helps to generalize the response for both the cases
 	*/
-	private void mitigateAgainstTimingAttack(UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken)
-	{
-		if (usernamePasswordAuthenticationToken.getCredentials() != null)
-		{
-			String presentedPassword = usernamePasswordAuthenticationToken.getCredentials().toString();
-			this.passwordEncoder.matches(presentedPassword, this.userNotFoundEncodedPassword);
-			throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials",
-					"Message: Authentication failed: Can not find Username "));
-		}
-	}
+    private void mitigateAgainstTimingAttack(UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) {
+        if (usernamePasswordAuthenticationToken.getCredentials() != null) {
+            String presentedPassword = usernamePasswordAuthenticationToken.getCredentials().toString();
+            this.passwordEncoder.matches(presentedPassword, this.userNotFoundEncodedPassword);
+            throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials",
+                    "Message: Authentication failed: Can not find Username "));
+        }
+    }
 
-	public void setUserDetailsService(UserDetailsService userDetailsService)
-	{
-		this.myUserDetailsService = userDetailsService;
-	}
+    public void setUserDetailsService(UserDetailsService userDetailsService) {
+        this.myUserDetailsService = userDetailsService;
+    }
 
 }

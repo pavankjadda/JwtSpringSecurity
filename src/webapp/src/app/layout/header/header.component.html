@@ -3,11 +3,11 @@
 
   <span class="header-spacer"></span>
 
-  <a mat-button style="color: white" routerLink="/login" *ngIf="!authService.isUserLoggedIn()">
+  <a *ngIf="!authService.isUserLoggedIn()" mat-button routerLink="/login" style="color: white">
     Login
   </a>
 
-  <a mat-button style="color: white"  routerLink="/login" *ngIf="authService.isUserLoggedIn()">
+  <a *ngIf="authService.isUserLoggedIn()" mat-button routerLink="/login" style="color: white">
     Logout
   </a>
 </mat-toolbar>

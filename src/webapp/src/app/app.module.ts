@@ -48,4 +48,6 @@ import {MainComponent} from './layout/main/main.component';
   providers: [HttpInterceptorProviders, CookieService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule
+{
+}

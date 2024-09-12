@@ -16,12 +16,11 @@ repositories {
 }
 
 
-ext
-{
-    springBootVersion = "2.4.4"
-    jjwtVersion="0.11.2"
-    lombokVersion="1.18.18"
-    springSecurityTest="5.4.5"
+ext {
+    springBootVersion = "3.3.2"
+    jjwtVersion = "0.12.6"
+    lombokVersion = "1.18.34"
+    springSecurityTest = "6.3.3"
 }
 
 dependencies {
@@ -33,10 +32,10 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
-    runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
-    runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
-    runtimeOnly "org.springframework.boot:spring-boot-devtools:$springBootVersion"
-    runtimeOnly "com.h2database:h2:1.4.200"
+    implementation "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+    implementation "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+    implementation "org.springframework.boot:spring-boot-devtools:$springBootVersion"
+    implementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testImplementation "org.springframework.security:spring-security-test:$springSecurityTest"
 }
@@ -44,7 +43,7 @@ dependencies {
 group = "com.pj"
 version = "1.1.0"
 description = "JwtSpringSecurity"
-sourceCompatibility = "11"
+sourceCompatibility = "21"
 
 publishing {
     publications {

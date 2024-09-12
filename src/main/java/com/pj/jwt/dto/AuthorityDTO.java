@@ -1,56 +1,41 @@
 package com.pj.jwt.dto;
 
-public class AuthorityDTO
-{
-	private String authority;
+import lombok.Getter;
+import lombok.Setter;
 
-	public AuthorityDTO(String authority)
-	{
-		this.authority = authority;
-	}
+import java.util.Objects;
 
-	public String getAuthority()
-	{
-		return this.authority;
-	}
+@Getter
+@Setter
+public class AuthorityDTO {
+    private String authority;
 
-	public void setAuthority(String authority)
-	{
-		this.authority = authority;
-	}
+    public AuthorityDTO(String authority) {
+        this.authority = authority;
+    }
 
-	public boolean equals(final Object o)
-	{
-		if (o == this)
-			return true;
-		if (!(o instanceof AuthorityDTO))
-			return false;
-		final AuthorityDTO other = (AuthorityDTO) o;
-		if (!other.canEqual((Object) this))
-			return false;
-		final Object this$authority = this.getAuthority();
-		final Object other$authority = other.getAuthority();
-		if (this$authority == null ? other$authority != null : !this$authority.equals(other$authority))
-			return false;
-		return true;
-	}
+    protected boolean canEqual(final Object other) {
+        return other instanceof AuthorityDTO;
+    }
 
-	protected boolean canEqual(final Object other)
-	{
-		return other instanceof AuthorityDTO;
-	}
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final Object $authority = this.getAuthority();
+        result = result * PRIME + ($authority == null ? 43 : $authority.hashCode());
+        return result;
+    }
 
-	public int hashCode()
-	{
-		final int PRIME = 59;
-		int result = 1;
-		final Object $authority = this.getAuthority();
-		result = result * PRIME + ($authority == null ? 43 : $authority.hashCode());
-		return result;
-	}
+    public boolean equals(final Object o) {
+        if (o == this) return true;
+        if (!(o instanceof AuthorityDTO other)) return false;
+        if (!other.canEqual(this)) return false;
+        final Object this$authority = this.getAuthority();
+        final Object other$authority = other.getAuthority();
+        return Objects.equals(this$authority, other$authority);
+    }
 
-	public String toString()
-	{
-		return "AuthorityDTO(authority=" + this.getAuthority() + ")";
-	}
+    public String toString() {
+        return "AuthorityDTO(authority=" + this.getAuthority() + ")";
+    }
 }
