@@ -1,10 +1,11 @@
 <ngx-spinner bdColor="rgba(51, 51, 51, 0.8)" color="#fff" size="large" type="ball-elastic-dots"></ngx-spinner>
 
-<div class="card login-form">
-  <div class="card-header h3">
-    <label style="margin-right: auto; margin-left: auto">Home</label>
-  </div>
-  <div class="card-body col-12">
-    <h2>Welcome home {{ authService.currentUserValue.username }}</h2>
-  </div>
-</div>
+<mat-card class="m-3 login-form">
+  <mat-card-title class="mx-auto h1">
+    <div class=" p-2">Welcome home {{ authService.currentUserValue.username }}</div>
+  </mat-card-title>
+  <hr />
+  <mat-card-content class="m-2 ">
+    <p>Welcome to the home page</p>
+  </mat-card-content>
+</mat-card>

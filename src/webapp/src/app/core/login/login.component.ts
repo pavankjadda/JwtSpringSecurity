@@ -1,31 +1,49 @@
+import { NgIf } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, signal } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
+import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
 import { USER_API_URL } from 'src/app/constants/app.constants';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss'],
-    standalone: false
+	selector: 'app-login',
+	templateUrl: './login.component.html',
+	styleUrls: ['./login.component.scss'],
+	imports: [
+		NgxSpinnerComponent,
+		FormsModule,
+		ReactiveFormsModule,
+		NgIf,
+		MatCardTitle,
+		MatCardContent,
+		MatFormField,
+		MatInput,
+		MatButton,
+		MatError,
+		MatLabel,
+		MatCard,
+	],
 })
 export class LoginComponent implements OnInit {
 	message: string;
 	loginForm: FormGroup;
 	submitted = false;
 	returnUrl: string;
-	loginFailed: boolean;
+	loginFailed = signal(false);
 
 	constructor(
-		private formBuilder: FormBuilder,
-		private route: ActivatedRoute,
-		private router: Router,
-		private authService: AuthService,
-		private spinner: NgxSpinnerService,
+		private readonly formBuilder: FormBuilder,
+		private readonly route: ActivatedRoute,
+		private readonly router: Router,
+		private readonly authService: AuthService,
+		private readonly spinner: NgxSpinnerService,
 	) {}
 
 	// convenience getter for easy access to form fields
@@ -70,8 +88,7 @@ export class LoginComponent implements OnInit {
 				}
 			},
 			(error) => {
-				console.log(error);
-				this.loginFailed = true;
+				this.loginFailed.set(true);
 				this.spinner.hide();
 			},
 			() => {
@@ -83,13 +100,6 @@ export class LoginComponent implements OnInit {
 	logout() {
 		this.authService.logout();
 		this.setMessage();
-	}
-
-	isUserLoggedIn() {}
-
-	resetForm() {
-		this.f.username.setValue(null);
-		this.f.password.setValue(null);
 	}
 
 	private setMessage() {
